@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<style type="text/css">
+			* {
+				margin: 0;
+				padding: 0;
+			}
+			
+			.a1 {
+				width: 500px;
+				height: 200px;
+				border: 1px solid red;
+				margin: 0 auto;
+				position: relative;
+				overflow: hidden;
+			}
+			
+			li {
+				float: left;
+				display: inline-block;
+			}
+			
+			.a2 {
+				position: relative;
+				width: 500px;
+				height: 200px;
+			}
+			
+			ul {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 3000px;
+				margin: 0;
+				padding: 0;
+				list-style: none;
+			}
+			
+			img {
+				display: inline;
+				width: 500px;
+				height: 200px;
+			}
+			
+			.a3 {
+				height: 50px;
+				position: absolute;
+				display: block;
+				width: 500px;
+				top: 75px;
+				display: none;
+				cursor: pointer;
+				color: white;
+			}
+			
+			.a3 #left {
+				text-align: center;
+				position: absolute;
+				left: 0;
+				background-color: blue;
+				font-size: 50px;
+				opacity:0.3;
+			}
+			
+			.a3 #right {
+				text-align: center;
+				position: absolute;
+				margin-left: 460px;
+				background-color: blue;
+				font-size: 50px;
+				opacity:0.3;
+			}
+			
+			ol li {
+				width: 20px;
+				text-align: center;
+				margin-left: 5px;
+				background-color: white;
+				color: black;
+				cursor: pointer;
+			}
+			
+			ol {
+				position: absolute;
+				top: 180px;
+			}
+			
+			.a5 {
+				background-color: yellow;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="a1" class="a1">
+			<div id="a2" class="a2">
+				<ul>
+					<li><img src="img/轮播图1.jpg" /></li>
+					<li><img src="img/轮播图2.jpg" /></li>
+					<li><img src="img/轮播图3.jpg" /></li>
+				</ul>
+				<ol>
+
+				</ol>
+			</div>
+			<div class="a3">
+				<span id="left">&lt;</span>
+				<span id="right">&gt;</span>
+			</div>
+		</div>
+		<script src="js/common.js"></script>
+		<script type="text/javascript">
+			var c = 2000;
+			var box = dgb('a1');
+			var mbox = dgb('a2');
+			var ul = mbox.children[0];
+			var ol = mbox.children[1];
+
+			//获取箭头里的元素
+			var jiantou = box.children[1];
+			var left = dgb('left');
+			var right = dgb('right');
+			//获取图片宽度
+			var imgWidth = mbox.offsetWidth;
+			//动态生成序号
+			//01获取图片的个数
+			var imgShu = ul.children.length;
+			for(i = 0; i < imgShu; i++) {
+				//02创建序号
+				var li = document.createElement('li');
+				ol.appendChild(li);
+				setInnerText(li, i + 1)
+				//记录自己的索引
+				li.index = i;
+				//给序号li注册点击事件
+				li.onclick = fun;
+				if(i === 0) {
+					li.className = 'a5';
+				}
+			}
+
+			function fun() {
+				//让图片动起来
+				dong(ul, -this.index * imgWidth);
+				//高亮
+				for(i = 0; i < imgShu; i++) {
+					li = ol.children[i];
+					li.className = '';
+				}
+				this.className = 'a5';
+				//让第一张默认选中
+				index = this.index;
+			}
+			//箭头的出现和后退前进
+
+			box.onmouseenter = function() {
+				jiantou.style.display = 'block';
+				clearInterval(s);
+			}
+			box.onmouseleave = function() {
+				jiantou.style.display = 'none';
+				s = setInterval(function(){
+				right.click();
+			},c);
+			}
+			//点击右键头下一张
+			var index = 0;
+			right.onclick = function(){
+				//等下一次点击时，索引等于最后一张时，
+				//让索引等于0并令ul的坐标等于第一张，
+				//再动画形式到第二张
+				//也就是复制图点击下一张时，
+				//先瞬间到第一张在以动画的形式到第二张
+				if (index === imgShu) {
+					index = 0;
+					ul.style.left = 0 + 'px'
+				}
+				
+				index++;
+				if(index < imgShu){
+					ol.children[index].click();
+				}else{
+					//移动画的方式一到最后一张
+				dong(ul,-index * imgWidth);	
+				for(i = 0; i < imgShu; i++) {
+					li = ol.children[i];
+					li.className = '';
+				}
+				//选中第一个序号
+				ol.children[0].className = 'a5';
+				}
+			}
+			//点击左箭头上一张
+			left.onclick = function(){
+				if(index === 0){
+					index = imgShu;
+					ul.style.left = -index * imgWidth + 'px'
+				}
+				index--;
+				if(index >= 0){
+					ol.children[index].click();
+				}
+			}
+			
+			//4无缝滚动
+			//4.1复制第一个li的图片
+			var cloneLi = ul.children[0].cloneNode(true);
+			ul.appendChild(cloneLi);
+			//自动
+			var s = setInterval(function(){
+				right.click();
+			},c)
+		</script>
+	</body>
+
+</html>
